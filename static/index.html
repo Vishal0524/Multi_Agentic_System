@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered Multi-Agent Productivity Assistant using Google ADK, A2A Protocol, and MCP Tools">
+    <title>Nexus AI — Multi-Agent Productivity Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🤖</text></svg>">
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Initializing Agents...</div>
+</div>
+
+<!-- Animated Background -->
+<div class="bg-animation">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🤖</div>
+                <div>
+                    <div class="logo-text">Nexus AI</div>
+                    <div class="logo-sub">Productivity Assistant</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <div class="nav-item active" data-view="dashboard" id="nav-dashboard">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-view="chat" id="nav-chat">
+                <span class="icon">💬</span>
+                <span>Agent Chat</span>
+            </div>
+
+            <div class="nav-section-title">Agents</div>
+            <div class="nav-item" data-view="chat" data-prompt="Show me all current tasks with their priorities and statuses">
+                <span class="icon">📋</span>
+                <span>Tasks</span>
+                <span class="badge" id="task-count">0</span>
+            </div>
+            <div class="nav-item" data-view="chat" data-prompt="What's on my calendar today and tomorrow?">
+                <span class="icon">📅</span>
+                <span>Calendar</span>
+                <span class="badge" id="event-count">0</span>
+            </div>
+            <div class="nav-item" data-view="chat" data-prompt="Show me all recent emails">
+                <span class="icon">📧</span>
+                <span>Email</span>
+                <span class="badge" id="email-count">0</span>
+            </div>
+            <div class="nav-item" data-view="chat" data-prompt="List all my notes organized by category">
+                <span class="icon">📝</span>
+                <span>Notes</span>
+                <span class="badge" id="note-count">0</span>
+            </div>
+
+            <div class="nav-section-title">System</div>
+            <div class="nav-item" data-view="chat" data-prompt="Give me a comprehensive daily briefing covering tasks, calendar, and emails">
+                <span class="icon">⚡</span>
+                <span>Daily Briefing</span>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="agent-status">
+                <div class="status-dot"></div>
+                <span>4 Agents Online</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1 id="view-title">Dashboard</h1>
+            <div class="top-bar-actions">
+                <button class="btn" onclick="toggleAgentPanel()">
+                    🤖 Agents
+                </button>
+                <button class="btn" onclick="reseedDatabase()">
+                    🔄 Reset Demo
+                </button>
+            </div>
+        </div>
+
+        <!-- Views Container -->
+        <div class="view-container">
+            <!-- Dashboard View -->
+            <div class="view dashboard-view active" id="view-dashboard">
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Stats cards populated by JS -->
+                </div>
+                <div class="dashboard-panels" id="dashboard-panels">
+                    <!-- Panels populated by JS -->
+                </div>
+            </div>
+
+            <!-- Chat View -->
+            <div class="view chat-view" id="view-chat">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-welcome" id="chat-welcome">
+                        <h2>👋 Hello! I'm Nexus AI</h2>
+                        <p>Your multi-agent productivity assistant. I coordinate specialized AI agents to help you manage tasks, schedules, emails, and knowledge.</p>
+                        <div class="quick-actions">
+                            <button class="quick-action" onclick="sendQuickAction('Give me a comprehensive daily briefing with tasks, calendar, and emails')">
+                                <div class="qa-icon">⚡</div>
+                                <div class="qa-text">Daily Briefing</div>
+                                <div class="qa-sub">Tasks, calendar & email summary</div>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickAction('Create a new task: Prepare investor pitch deck with critical priority, assigned to Sarah, due April 15')">
+                                <div class="qa-icon">📋</div>
+                                <div class="qa-text">Create Task</div>
+                                <div class="qa-sub">Add a new project task</div>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickAction('Schedule a team strategy meeting for tomorrow at 2 PM to 3 PM in Conference Room B with Sarah Chen and Mike Rivera')">
+                                <div class="qa-icon">📅</div>
+                                <div class="qa-text">Schedule Meeting</div>
+                                <div class="qa-sub">Book a new calendar event</div>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickAction('Draft a professional email to the engineering team about the upcoming Q2 product launch preparations and timeline')">
+                                <div class="qa-icon">📧</div>
+                                <div class="qa-text">Draft Email</div>
+                                <div class="qa-sub">Compose and send emails</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <textarea
+                            class="chat-input"
+                            id="chat-input"
+                            placeholder="Ask Nexus AI anything... (e.g., 'Create a task', 'Schedule a meeting', 'Send an email')"
+                            rows="1"
+                            onkeydown="handleChatKeydown(event)"
+                        ></textarea>
+                        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                            ▶
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Agent Panel -->
+    <aside class="agent-panel" id="agent-panel">
+        <h3>🤖 Agent Activity</h3>
+
+        <div class="agent-card" id="agent-card-orchestrator">
+            <div class="agent-card-header">
+                <div class="agent-card-icon" style="background: var(--gradient-primary);">🧠</div>
+                <div>
+                    <div class="agent-card-name">Orchestrator</div>
+                    <div class="agent-card-status">Root coordinator</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-card" id="agent-card-task_manager">
+            <div class="agent-card-header">
+                <div class="agent-card-icon" style="background: rgba(251, 146, 60, 0.2);">📋</div>
+                <div>
+                    <div class="agent-card-name">Task Manager</div>
+                    <div class="agent-card-status">Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-card" id="agent-card-calendar_agent">
+            <div class="agent-card-header">
+                <div class="agent-card-icon" style="background: rgba(96, 165, 250, 0.2);">📅</div>
+                <div>
+                    <div class="agent-card-name">Calendar Agent</div>
+                    <div class="agent-card-status">Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-card" id="agent-card-email_agent">
+            <div class="agent-card-header">
+                <div class="agent-card-icon" style="background: rgba(244, 114, 182, 0.2);">📧</div>
+                <div>
+                    <div class="agent-card-name">Email Agent</div>
+                    <div class="agent-card-status">Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-card" id="agent-card-notes_agent">
+            <div class="agent-card-header">
+                <div class="agent-card-icon" style="background: rgba(74, 222, 128, 0.2);">📝</div>
+                <div>
+                    <div class="agent-card-name">Notes Agent</div>
+                    <div class="agent-card-status">Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+            <h3 style="font-size: 12px; margin-bottom: 12px;">🔗 A2A Protocol</h3>
+            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.8;">
+                <div>Protocol: <span style="color: var(--accent-green);">Active</span></div>
+                <div>Agent Card: <code style="font-size: 10px;">/.well-known/agent.json</code></div>
+                <div>Endpoint: <code style="font-size: 10px;">/tasks/send</code></div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

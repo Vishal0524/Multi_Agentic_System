@@ -60,7 +60,8 @@ NEXUS is a **multi-agent AI system** where a **Primary Orchestrator Agent** coor
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nexus-agent.git
+mkdir nexus-agent
+git clone https://github.com/Vishal0524/Multi_Agentic_System.git
 cd nexus-agent
 
 # Backend
@@ -91,7 +92,7 @@ cd frontend
 npm run dev
 ```
 
-Visit **http://localhost:5173** — NEXUS loads with full mock data and simulated agent workflows.
+Visit **http://localhost:5173** — NEXUS loads agent workflows.
 
 ---
 
@@ -126,7 +127,7 @@ nexus-agent/
 │   ├── database/        # SQLite + schema
 │   │   ├── db.py
 │   │   ├── schema.sql
-│   │   └── seed_data.py      # Demo mock data
+│   │   └── seed_data.py    
 │   ├── workflows/       # Multi-step workflow definitions
 │   │   ├── morning_brief.py
 │   │   ├── project_kickoff.py
@@ -148,7 +149,7 @@ nexus-agent/
 
 ---
 
-## 🎬 Demo Workflows
+## 🎬 Workflows
 
 | Workflow | Trigger Phrase | Agents Involved |
 |---|---|---|

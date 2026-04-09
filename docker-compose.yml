@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  # ── Backend API ─────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      APP_MODE: demo
+      PORT: 8080
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-demo}
+      COMPOSIO_API_KEY: ${COMPOSIO_API_KEY:-demo}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-demo}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-sandbox.mailgun.org}
+      MAILGUN_TEST_MODE: "true"
+      LINEAR_API_KEY: ${LINEAR_API_KEY:-demo}
+      DATABASE_URL: sqlite:///./nexus.db
+    volumes:
+      - nexus_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend Dev Server (optional — for hot-reload dev) ──────────────────
+  frontend-dev:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    command: sh -c "npm install && npm run dev -- --host"
+    profiles: ["dev"]  # Only starts with: docker-compose --profile dev up
+
+volumes:
+  nexus_data:
